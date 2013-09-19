@@ -48,12 +48,6 @@ class Grid
     board.flatten.map(&:value)
   end
 
-  # def fetch_box(box_index)
-  #   @board.flatten.select do |cell|
-  #     cell.box_index == box_index
-  #   end.flatten
-  # end
-
   def fetch_box(box_index)
     @board.map do |row|
       row.select do |cell|
@@ -143,8 +137,15 @@ class Grid
   end
 
   def provide_puzzle
-
+    puzzle = []
+    for index in 1..9
+      puzzle << (get_cell_values_from(fetch_box(index)))
+    end
+    puzzle.flatten!
+    puzzle.map!(&:to_s)
   end
+
+
 
   def inspect_board
     puts "-------------------------------------"
