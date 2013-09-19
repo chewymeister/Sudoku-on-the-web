@@ -1,3 +1,9 @@
+body {
+  text-align: center;
+  font-family: Georgia;
+  color: red;
+}
+
 .box, .cell {
 	display: inline-block;
 }
@@ -5,9 +11,39 @@
 .cell input {
   width: 30px;
   height: 30px;
+  border: solid 1px black;
+ /* margin: 0;
+  padding: 0;*/
 }
 
 #sudoku {
   font-size: 0;
-  text-align: center;
+  margin-left: auto;
+  /*width: 100%;*/
 }
+
+#container {
+  width: 100%;
+}
+
+
+div.row div:nth-child(3) {
+  border-right: solid 2px red;
+  /*margin-bottom: 50px;*/
+}
+
+div.row div:nth-child(6) {
+  border-right: solid 2px green;
+}
+
+
+/*#sudoku div:nth-of-type(3) {
+  border-bottom: solid 2px red;
+}*/
+
+div.cell-row div:nth-child(6) {
+  border-right: solid 2px red;
+}
+/*div.cell_row div:nth-child(9) {
+  border: none;
+}*/

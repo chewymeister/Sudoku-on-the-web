@@ -7,8 +7,9 @@
   <link rel="stylesheet" href="../css/application.css">
 </head>
 <body>
+  <h1>Life is too short for playing Sudoku</h1>
   
-  <div id="sudoku">
+  <!-- <div id="sudoku">
     <% 3.times do |row| %>
       <div class="row">
         <% 3.times do |box| %>
@@ -26,7 +27,23 @@
         <% end %>
       </div>
     <% end %>
+  </div> -->
+  <div id="container">
+    <div id="sudoku">
+      <% 3.times do |row| %>
+        <div class="row">
+          <% 3.times do |cell_row| %>
+            <div class="cell-row">
+              <% 9.times do |cell| %>
+              <div class="cell">
+                <input type="text" maxlength="1" autocomplete="off">
+              </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
   </div>
-
 </body>
 </html>
