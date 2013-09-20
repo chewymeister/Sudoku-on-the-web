@@ -16,6 +16,10 @@ body {
   font-size: 16px;
 }
 
+.box {
+  border: solid black 2px;
+}
+
 #sudoku {
   font-size: 0;
   margin-left: auto;

@@ -1,14 +1,13 @@
 require 'sinatra'
-# require 'sinatra/partial'
+require 'sinatra/partial'
 # require 'rack-flash'
 require_relative './lib/cell'
 require_relative './lib/grid'
 require_relative './lib/box'
 
-configure :production do
-  require 'newrelic_rpm'
-end
+require 'newrelic_rpm'
 
+# set :partial_template_engine, :erb
 enable :sessions
 
 
@@ -93,23 +92,27 @@ get '/solution' do
   @current_solution = session[:solution]
   @solution = session[:solution]
   @puzzle = session[:puzzle]
-  print "This is after get solution #{@current_solution}"
   erb :index
 end
 
+get '/reset' do
+  @current_solution = session[:puzzle]
+  @solution = session[:solution]
+  @puzzle = session[:puzzle]
+  erb :index
+end
+
+
+
 post '/' do
   cells = box_order_to_row_order(params["cell"])
-  # cells = params["cell"]
-  print "this is cells #{cells} \n"
   session[:current_solution] = cells.map{|value| value.to_i}.join
-  print "This is after post                #{session[:current_solution]} \n"
   session[:check_solution] = true
   redirect to ("/")
 end
 
-get '/reset' do
+get '/new_puzzle' do
   session.delete(:current_solution)
-  print "This is after get                #{session[:current_solution]} \n"
   redirect to ("/")
 end
 
