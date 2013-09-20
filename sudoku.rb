@@ -60,8 +60,13 @@ helpers do
   def colour_class solution_to_check, puzzle_value, current_solution_value, solution_value
     must_be_guessed = puzzle_value == "0"
     tried_to_guess = current_solution_value.to_i != 0
-    guessed_incorrectly = current_solution_value != solution_value
-
+    print "========================================================\n"
+    print "current solution value: #{current_solution_value}"
+    guessed_incorrectly = (current_solution_value.to_i != solution_value)
+    print "||  #{current_solution_value} | #{solution_value}  || \n"
+    print "must be guessed: #{must_be_guessed}\n"
+    print "tried to guess: #{tried_to_guess}\n"
+    print "guessed_incorrectly: #{guessed_incorrectly}\n"
     if solution_to_check && must_be_guessed && tried_to_guess && guessed_incorrectly
       'incorrect'
     elsif !must_be_guessed
@@ -101,8 +106,6 @@ get '/reset' do
   @puzzle = session[:puzzle]
   erb :index
 end
-
-
 
 post '/' do
   cells = box_order_to_row_order(params["cell"])
