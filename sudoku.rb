@@ -21,7 +21,7 @@ end
 
 def puzzle sudoku
   sudoku_puzzle = sudoku.clone
-  random_index = (0..80).to_a.sample(60)
+  random_index = (0..80).to_a.sample(30)
   random_index.each do |index|
     sudoku_puzzle[index] = '0'
   end
