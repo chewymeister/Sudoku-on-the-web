@@ -13,12 +13,12 @@ def random_sudoku
   sudoku = Grid.new(seed.join)
   sudoku.set_board
   sudoku.solve_board!
-  sudoku.provide_puzzle
+  sudoku.get_cell_values_from sudoku.board
 end
 
 def puzzle sudoku
   sudoku_puzzle = sudoku.clone
-  random_index = (0..80).to_a.sample(40)
+  random_index = (0..80).to_a.sample(60)
   random_index.each do |index|
     sudoku_puzzle[index] = '0'
   end
@@ -59,10 +59,7 @@ helpers do
     tried_to_guess = current_solution_value.to_i != 0
     guessed_incorrectly = current_solution_value != solution_value
 
-    if solution_to_check &&
-      must_be_guessed &&
-      tried_to_guess &&
-      guessed_incorrectly
+    if solution_to_check && must_be_guessed && tried_to_guess && guessed_incorrectly
       'incorrect'
     elsif !must_be_guessed
       'value-provided'
@@ -89,12 +86,17 @@ get '/' do
 end
 
 get '/solution' do
-  @puzzle = session[:solution]
+  @current_solution = session[:solution]
+  @solution = session[:solution]
+  @puzzle = session[:puzzle]
+  print "This is after get solution #{@current_solution}"
   erb :index
 end
 
 post '/' do
   cells = box_order_to_row_order(params["cell"])
+  # cells = params["cell"]
+  print "this is cells #{cells} \n"
   session[:current_solution] = cells.map{|value| value.to_i}.join
   print "This is after post                #{session[:current_solution]} \n"
   session[:check_solution] = true
