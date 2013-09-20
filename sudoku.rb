@@ -1,10 +1,13 @@
 require 'sinatra'
-require 'newrelic_rpm'
 # require 'sinatra/partial'
 # require 'rack-flash'
 require_relative './lib/cell'
 require_relative './lib/grid'
 require_relative './lib/box'
+
+configure :production do
+  require 'newrelic_rpm'
+end
 
 enable :sessions
 
