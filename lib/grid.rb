@@ -19,7 +19,7 @@ class Grid
 
   def assign_box_index_values 
     @box.assign_box_indices @board
-  end    
+  end
 
   def assign_row_column_index_values
     row_index = nil
