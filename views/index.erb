@@ -1,4 +1,3 @@
-<!-- "Hello Sudoku!" -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -8,44 +7,36 @@
 </head>
 <body>
   <h1>Life is too short for playing Sudoku</h1>
-  
   <div id="sudoku">
-    <div id="top-buttons" class="group">
-      <form action="/new_puzzle" method="get">
-        <button class="top-button">Generate New Puzzle</button>
-      </form>
-      <form action="/solution">
-        <button id="give-up">Give up? Click for solution</button>
-      </form>
-    </div>
-    <div id="bottom-buttons">
-      <form action="/" method="post">
-        <% 3.times do |row| %>
-          <div class="row">
-            <% 3.times do |box| %>
-              <div class="box">
-                <% 3.times do |cell_row| %>
-                  <div class="cell-row">
-                    <% 3.times do |cell| %>
-                      <div class="cell">
-                        <% cell_index = row * 27 + box * 3 + cell_row * 9 + cell %>
-                        <% cell_value = cell_value(@current_solution[cell_index]) %>
-                        <% colour_class = colour_class(@check_solution, @puzzle[cell_index], @current_solution[cell_index], @solution[cell_index]) %>
-                        <input class="<%=colour_class%>" name="cell[]" type="text" maxlength="1" autocomplete="off" value="<%=cell_value %>">
-                      </div>
-                    <% end %>
-                  </div>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-        <% end %>
-        <button id="check-solution">Check Solution</button>
-      </form>
-      <form action="/reset" method="get">
-        <button id="reset">Reset the Board</button>
-      </form>
-    </div>
+    <form action="/new_puzzle" method="get">
+      <button id="new-puzzle" class="button">Generate New Puzzle</button>
+    </form>
+    <form action="/solution">
+      <button id="give-up" class="button">Give up? Click for solution</button>
+    </form>
+    <form action="/" method="post">
+      <% 3.times do |row| %>
+        <div class="row">
+          <% 3.times do |box| %>
+            <div class="box">
+              <% 3.times do |cell_row| %>
+                <div class="cell-row">
+                  <% 3.times do |cell| %>
+                    <div class="cell">
+                      <%= partial :_cell, :locals=>{:cell_index => row*27+box*3+cell_row*9+cell} %>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+      <button id="check-solution" class="button">Check Solution</button>
+    </form>
+    <form action="/reset" method="get">
+      <button id="reset" class="button">Reset the Board</button>
+    </form>
   </div>
 
 </body>
