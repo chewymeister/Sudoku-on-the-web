@@ -10,10 +10,12 @@ class Grid
     @box = Box.new
   end
 
-  def assign_values_to_cells
-    @board = @puzzle.map do |value|
-      Cell.new value.to_i
-    end.each_slice(9).to_a
+  def array_of_cells_with_values
+    @puzzle.map { |value| Cell.new value.to_i }
+  end
+
+  def create_board_from array
+    @board = array.each_slice(9).to_a
   end
 
   def assign_box_index_values 
@@ -21,51 +23,37 @@ class Grid
   end
 
   def assign_row_column_index_values
-    row_index = nil
-    column_index = nil
-    @board.each do |row|
-      row_index = @board.index(row)
-      row.each do |cell|
-        column_index = row.index(cell)
-        cell.assign_row(row_index)
-        cell.assign_column(column_index)
+    @board.each_with_index do |row, row_index|
+      row.each_with_index do |cell, column_index|
+        cell.assign_indices(row_index, column_index)
       end
-    end               
+    end
   end
 
-  def fetch_row(row_index)
-    @board[row_index].flatten
+  def row_neighbours_for(current_cell)
+    @board[current_cell.row_index].map(&:value)
   end
 
-  def fetch_column(column_index)
-    @board.map do |row|
-      row[column_index]
-    end.flatten
+  def column_neighbours_for(current_cell)
+    @board.map { |row| row[current_cell.column_index].value }
+  end
+
+  def box_neighbours_for(current_cell)
+    @board.flatten.select { |cell| cell.box_index == current_cell.box_index }.map(&:value)
   end
 
   def get_cell_values_from board
     board.flatten.map(&:value)
   end
 
-  def fetch_box(box_index)
-    @board.map do |row|
-      row.select do |cell|
-        cell.box_index == box_index
-      end
-    end.flatten
-  end
-
   def set_board
-    assign_values_to_cells
+    create_board_from(array_of_cells_with_values)
     assign_box_index_values
     assign_row_column_index_values
   end
 
   def assign_neighbours_to cell
-    neighbours = []
-    neighbours <<fetch_row(cell.row_index).map {|cell| cell.value}
-    neighbours <<fetch_column(cell.column_index).map {|cell| cell.value}
-    neighbours <<fetch_box(cell.box_index).map {|cell| cell.value}
+    neighbours = [row_neighbours_for(cell), column_neighbours_for(cell), box_neighbours_for(cell)]
     cell.assign neighbours
   end
 
@@ -73,41 +61,44 @@ class Grid
     @board.flatten.each do |cell|
       if cell.filled_out?
         cell
-      else 
+      else
         assign_neighbours_to cell
-        cell.attempt_to_solve cell.neighbours
+        cell.attempt_to_solve
       end
     end
   end
 
   def solved?
-    @board.flatten.select do |cell|
-      !cell.filled_out?
-    end.count == 0
+    list_of_outstanding_cells.count == 0
+  end
+
+  def list_of_completed_cells
+    @board.flatten.select { |cell| cell.filled_out? }
+  end
+
+  def list_of_outstanding_cells
+    @board.flatten.select(&:empty?)
   end
 
   def solve_board!
     outstanding_before, looping = SIZE, false
     while !solved? && !looping
       solve
-      outstanding = @board.flatten.count {|c| c.filled_out?}
-      looping = outstanding_before == outstanding
-      outstanding_before = outstanding
+      looping = outstanding_before == list_of_completed_cells.count
+      outstanding_before = list_of_completed_cells.count
     end
-      try_harder unless solved?
+    try_harder unless solved?
   end
 
-  def create_blank_cell
-    blank_cell = @board.flatten.select do |cell|
-      !cell.filled_out?
-    end.first
+  def first_blank_cell
+    list_of_outstanding_cells.first
   end
 
   def try_harder
-    blank_cell = create_blank_cell
+    blank_cell = first_blank_cell
 
     blank_cell.candidates.each do |candidate|
-      blank_cell.assume candidate
+      blank_cell.assume(candidate)
       board_copy = replicate(@board)
 
       board_copy.solve_board!
@@ -124,15 +115,13 @@ class Grid
   end
 
   def replicate board
-    board_replicate = Grid.new create_current_puzzle_string_of(board)
+    board_replicate = Grid.new create_puzzle_string_of_current(board)
     board_replicate.set_board
     board_replicate
   end
 
-  def create_current_puzzle_string_of board
-    current_puzzle_string = board.flatten.map do |cell|
-      cell.value
-    end.join
+  def create_puzzle_string_of_current board
+    board.flatten.map(&:value).join
   end
 
   def provide_puzzle
@@ -142,6 +131,10 @@ class Grid
     end
     puzzle.flatten!
     puzzle.map!(&:to_s)
+  end
+
+  def fetch_box(index)
+    @board.flatten.select { |cell| cell.box_index == index }
   end
 
   def inspect_board

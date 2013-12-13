@@ -13,25 +13,24 @@ class Cell
     @solvable = true
   end
 
-  def assign_row index
-    @row_index = index
+  def assign_indices(row_index, column_index)
+    @row_index, @column_index = row_index, column_index
   end
 
-  def assign_column index
-    @column_index = index
-  end
-  
   def assign_box_index value
     @box_index = value
   end
 
   def assign(neighbours)
-    @neighbours += neighbours
-    @neighbours.flatten!
+    @neighbours = neighbours.flatten
   end
 
   def filled_out?
     @value != 0
+  end
+
+  def empty?
+    @value == 0
   end
 
   def solvable?
@@ -42,8 +41,8 @@ class Cell
     @solvable = false
   end
 
-  def attempt_to_solve(neighbours)
-      @candidates -= neighbours
+  def attempt_to_solve
+      @candidates -= @neighbours
       if @candidates.count == 1
         @value = @candidates.pop
         @neighbours.clear

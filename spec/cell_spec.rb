@@ -17,16 +17,11 @@ describe Cell do
     expect(cell.box_index).to eq 1
   end
 
-  it 'assigns row index value given to it by grid' do
-    cell.assign_row 2
+  it "assigns both the row index and the column index given to it by grid" do
+    cell.assign_indices(2,2)
 
     expect(cell.row_index).to eq 2
-  end
-
-  it 'assigns column index value given to it by grid' do
-    cell.assign_column 3
-
-    expect(cell.column_index).to eq 3
+    expect(cell.column_index).to eq 2
   end
 
   it 'assigns neighbours when an array of neighbours is given to the cell' do
@@ -37,19 +32,23 @@ describe Cell do
   
   it 'takes away list of neighbours from candidates when called to by grid' do
     neighbours = [1,2,6,7,8,9]
-    cell.attempt_to_solve neighbours
+    cell.assign(neighbours)
+    cell.attempt_to_solve
+
     expect(cell.candidates ).to match_array [3,4,5]
   end
 
   it 'when there is only one possibility left in candidates, it is assigned to value' do
     neighbours = [1,2,3,5,6,7,8,9]
-    cell.attempt_to_solve neighbours
+    cell.assign(neighbours)
+    cell.attempt_to_solve
 
     expect(cell.filled_out?).to be_true
   end
 
   it 'assumes the candidate given to it by the try_harder! method' do
     cell.assume 7
+    
     expect(cell.filled_out?).to be_true
   end
 
