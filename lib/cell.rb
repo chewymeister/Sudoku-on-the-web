@@ -1,5 +1,4 @@
 class Cell
-
   attr_accessor :value
   attr_reader :box_index
   attr_reader :neighbours
@@ -56,5 +55,4 @@ class Cell
   def assume candidate
     @value = candidate
   end
-
 end

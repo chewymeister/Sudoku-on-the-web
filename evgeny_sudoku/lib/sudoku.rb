@@ -5,7 +5,7 @@ class Sudoku
   BOX_SIZE = Math.sqrt(COLUMN_SIZE)
 
   attr_reader :cells
-  private :cells
+  # private :cells
 
   def initialize(args)
     raise "Wrong number of values given, #{SIZE} expected" unless args.length == SIZE

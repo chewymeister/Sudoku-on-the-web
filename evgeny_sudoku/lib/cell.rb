@@ -1,7 +1,6 @@
 require 'set'
 
 class Cell
-
   attr_reader :slices, :value
 
   def initialize(value)
@@ -38,5 +37,4 @@ class Cell
   def neighbours
   	@slices.flatten.map(&:value).inject(Set.new) {|set, digit| set << digit}.delete(0)
   end
-  
 end

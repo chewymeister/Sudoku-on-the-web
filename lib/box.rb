@@ -1,5 +1,4 @@
 class Box
-
   def row_range(index)
     case index
     when 1,2,3
@@ -35,5 +34,4 @@ class Box
       iterate_to_assign(board,index)
     end
   end
-
 end

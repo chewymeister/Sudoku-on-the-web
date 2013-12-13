@@ -2,7 +2,6 @@ require_relative './cell'
 require_relative './box'
 
 class Grid
-  
   SIZE = 81
 
   attr_reader :board
@@ -31,8 +30,8 @@ class Grid
         cell.assign_row(row_index)
         cell.assign_column(column_index)
       end
-    end                 
-  end 
+    end               
+  end
 
   def fetch_row(row_index)
     @board[row_index].flatten
@@ -63,11 +62,11 @@ class Grid
   end
 
   def assign_neighbours_to cell
-      neighbours = []
-      neighbours <<fetch_row(cell.row_index).map {|cell| cell.value}
-      neighbours <<fetch_column(cell.column_index).map {|cell| cell.value}
-      neighbours <<fetch_box(cell.box_index).map {|cell| cell.value}
-      cell.assign neighbours
+    neighbours = []
+    neighbours <<fetch_row(cell.row_index).map {|cell| cell.value}
+    neighbours <<fetch_column(cell.column_index).map {|cell| cell.value}
+    neighbours <<fetch_box(cell.box_index).map {|cell| cell.value}
+    cell.assign neighbours
   end
 
   def solve
@@ -145,8 +144,6 @@ class Grid
     puzzle.map!(&:to_s)
   end
 
-
-
   def inspect_board
     puts "-------------------------------------"
     @board.each do |row|
@@ -156,5 +153,4 @@ class Grid
     puts "|\n-------------------------------------"
     end
   end
-
 end
