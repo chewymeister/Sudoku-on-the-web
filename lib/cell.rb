@@ -1,57 +1,46 @@
-class Cell
-  attr_accessor :value
-  attr_reader :box_index
+require 'spec_helper'
+
+class Cell 
+  attr_reader :value
   attr_reader :neighbours
-  attr_reader :row_index
-  attr_reader :column_index
   attr_reader :candidates
-
-  def initialize value
+  def initialize(value)
     @value = value
-    @candidates = [1,2,3,4,5,6,7,8,9]
     @neighbours = []
-    @solvable = true
+    @candidates = ['1','2','3','4','5','6','7','8','9']
   end
 
-  def assign_indices(row_index, column_index)
-    @row_index, @column_index = row_index, column_index
-  end
-
-  def assign_box_index value
-    @box_index = value
+  def solve_using(neighbours)
+    assign(neighbours)
+    attempt_solution unless solved?
   end
 
   def assign(neighbours)
-    @neighbours = neighbours.flatten
+    @neighbours = neighbours.map(&:value)
   end
 
-  def filled_out?
-    @value != 0
+  def attempt_solution
+    eliminate_candidates
+    assign_candidate_to_value if one_candidate_left? 
   end
 
-  def empty?
-    @value == 0
+  def eliminate_candidates
+    @candidates -= @neighbours
   end
 
-  def solvable?
-    @solvable == true
+  def assign_candidate_to_value
+    @value = @candidates.pop 
+  end
+  
+  def one_candidate_left?
+    @candidates.count == 1
   end
 
-  def unsolvable!
-    @solvable = false
+  def solved?
+    @value != '0'
   end
 
-  def attempt_to_solve
-      @candidates -= @neighbours
-      if @candidates.count == 1
-        @value = @candidates.pop
-        @neighbours.clear
-      else
-        @neighbours.clear
-      end
-  end
-
-  def assume candidate
+  def assume(candidate)
     @value = candidate
   end
 end

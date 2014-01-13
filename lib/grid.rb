@@ -1,149 +1,136 @@
-require_relative './cell'
-require_relative './box'
+require 'spec_helper'
 
 class Grid
-  SIZE = 81
+  ROW_STARTING_POINT = [0, 0, 0, 3, 3, 3, 6, 6, 6]
+  STARTING_POINT = [0,3,6] * 3
+  attr_reader :cells
 
-  attr_reader :board
-  def initialize puzzle
-    @puzzle = puzzle.chars
-    @box = Box.new
+  def initialize(puzzle)
+    assign_values_to_cells_using(puzzle)
+    @rows = retrieve_rows
+    @columns = retrieve_columns
+    @boxes = retrieve_boxes
   end
 
-  def array_of_cells_with_values
-    @puzzle.map { |value| Cell.new value.to_i }
+  def assign_values_to_cells_using(puzzle)
+    @cells = puzzle.chars.map { |num| Cell.new(num) }
+  end
+  
+  def retrieve_rows
+    @cells.each_slice(9).to_a
   end
 
-  def create_board_from array
-    @board = array.each_slice(9).to_a
+  def retrieve_columns
+    retrieve_rows.transpose
   end
 
-  def assign_box_index_values 
-    @box.assign_box_indices @board
+  def retrieve_boxes
+    (0..8).inject([]) { |boxes, number| boxes << extract_box(number) }
   end
 
-  def assign_row_column_index_values
-    @board.each_with_index do |row, row_index|
-      row.each_with_index do |cell, column_index|
-        cell.assign_indices(row_index, column_index)
-      end
-    end
+  def extract_box(number)
+    three_columns_containing(number, from_three_rows_containing(number))
   end
 
-  def row_neighbours_for(current_cell)
-    @board[current_cell.row_index].map(&:value)
+  def from_three_rows_containing(index)
+    retrieve_rows.slice(ROW_STARTING_POINT[index],3).transpose
   end
 
-  def column_neighbours_for(current_cell)
-    @board.map { |row| row[current_cell.column_index].value }
+  def three_columns_containing(index, rows)
+    rows.slice(STARTING_POINT[index],3).transpose.flatten
   end
 
-  def box_neighbours_for(current_cell)
-    @board.flatten.select { |cell| cell.box_index == current_cell.box_index }.map(&:value)
+  def attempt
+    @cells.each { |cell| cell.solve_using neighbours_of cell }
   end
 
-  def get_cell_values_from board
-    board.flatten.map(&:value)
+  def neighbours_of(cell)
+    [row_holding(cell), column_holding(cell), box_holding(cell)].flatten
   end
 
-  def set_board
-    create_board_from(array_of_cells_with_values)
-    assign_box_index_values
-    assign_row_column_index_values
+  def row_holding(cell)
+    @rows.select { |row| row.include?(cell) }
   end
 
-  def assign_neighbours_to cell
-    neighbours = [row_neighbours_for(cell), column_neighbours_for(cell), box_neighbours_for(cell)]
-    cell.assign neighbours
+  def column_holding(cell)
+    @columns.select { |column| column.include?(cell) }
   end
 
-  def solve
-    @board.flatten.each do |cell|
-      if cell.filled_out?
-        cell
-      else
-        assign_neighbours_to cell
-        cell.attempt_to_solve
-      end
-    end
+  def box_holding(cell)
+    @boxes.select { |box| box.include?(cell) }
+  end
+
+  def board_values
+    @cells.map(&:value)
+  end
+
+  def to_s
+    board_values.join
   end
 
   def solved?
-    list_of_outstanding_cells.count == 0
+    unsolved_cells.count == 0
   end
 
-  def list_of_completed_cells
-    @board.flatten.select { |cell| cell.filled_out? }
-  end
-
-  def list_of_outstanding_cells
-    @board.flatten.select(&:empty?)
+  def unsolved_cells
+    @cells.select { |cell| !cell.solved? }
   end
 
   def solve_board!
-    outstanding_before, looping = SIZE, false
-    while !solved? && !looping
-      solve
-      looping = outstanding_before == list_of_completed_cells.count
-      outstanding_before = list_of_completed_cells.count
+    @outstanding_before = 81 
+    while not solved? and not looping?
+      attempt
+      @outstanding_before = unsolved_cells.count
     end
     try_harder unless solved?
   end
 
-  def first_blank_cell
-    list_of_outstanding_cells.first
+  def looping?
+    @outstanding_before == unsolved_cells.count
   end
 
   def try_harder
-    blank_cell = first_blank_cell
-
     blank_cell.candidates.each do |candidate|
       blank_cell.assume(candidate)
-      board_copy = replicate(@board)
+      board_copy = new_grid
 
       board_copy.solve_board!
 
-      if board_copy.solved?
-        steal_solution(board_copy)
-        break
-      end
+      steal_solution(board_copy) and break if board_copy.solved?
     end
   end
 
-  def steal_solution board
-    @board = board.board
+  def blank_cell
+    unsolved_cells.first
   end
 
-  def replicate board
-    board_replicate = Grid.new create_puzzle_string_of_current(board)
-    board_replicate.set_board
-    board_replicate
+  def steal_solution(copy)
+    @cells = copy.cells
   end
 
-  def create_puzzle_string_of_current board
-    board.flatten.map(&:value).join
+  def new_grid
+    self.class.new(to_s)
   end
 
-  def provide_puzzle
-    puzzle = []
-    for index in 1..9
-      puzzle << (get_cell_values_from(fetch_box(index)))
-    end
-    puzzle.flatten!
-    puzzle.map!(&:to_s)
+  def guess_cell
+    unsolved_cells.first.guess_value!
   end
 
-  def fetch_box(index)
-    @board.flatten.select { |cell| cell.box_index == index }
+  def unsolved_cell_count
+    @board.flatten.select(&:unsolved?).count
   end
 
   def inspect_board
     puts "-------------------------------------"
-    @board.each do |row|
+    retrieve_rows.each do |row|
       row.each do |cell|
         print "| #{cell.value} "
       end
     puts "|\n-------------------------------------"
     end
+  end
+
+  def provide_puzzle
+    @boxes.flatten.map(&:value).join
   end
 end

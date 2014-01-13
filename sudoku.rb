@@ -123,5 +123,4 @@ class Sudoku < Sinatra::Base
     session.delete(:current_solution)
     redirect to ("/")
   end
-
 end
