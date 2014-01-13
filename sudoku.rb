@@ -5,7 +5,6 @@ require 'sinatra/partial'
 
 require_relative './lib/cell'
 require_relative './lib/grid'
-require_relative './lib/box'
 
 require 'newrelic_rpm'
 
@@ -18,9 +17,8 @@ class Sudoku < Sinatra::Base
   def random_sudoku
     seed = (1..9).to_a.shuffle + Array.new(81-9,0)
     sudoku = Grid.new(seed.join)
-    sudoku.set_board
     sudoku.solve_board!
-    sudoku.get_cell_values_from sudoku.board
+    sudoku.row_values
   end
 
   def puzzle sudoku

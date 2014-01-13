@@ -1,9 +1,8 @@
-require 'spec_helper'
-
 class Grid
   ROW_STARTING_POINT = [0, 0, 0, 3, 3, 3, 6, 6, 6]
   STARTING_POINT = [0,3,6] * 3
   attr_reader :cells
+  attr_reader :rows
 
   def initialize(puzzle)
     assign_values_to_cells_using(puzzle)
@@ -61,6 +60,10 @@ class Grid
   end
 
   def board_values
+    @cells.map(&:value)
+  end
+
+  def row_values
     @cells.map(&:value)
   end
 
